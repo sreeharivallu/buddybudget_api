@@ -48,10 +48,9 @@ var updateGroupAmountAndPartnerAmount = (username, groupName) => {
 			groupAmount += groupItemList[i].priceperqty*groupItemList[i].quantity;
 		}
 
-	let partnerAmounts = getPartnerAmounts(groupItemList);
+	let partnerAmounts = getPartnerAmounts(groupItemList);	
 	let query  = {$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}], groupList:{$elemMatch: {groupName: groupName}}};
-	return	insertItem.updatedocument(common.userCollection, query,{$set:{"groupList.$.groupAmount": groupAmount}, $set:{"groupList.$.partnerAmounts":partnerAmounts}})
-
+	return	insertItem.updatedocument(common.userCollection, query,{$set:{"groupList.$.groupAmount": groupAmount, "groupList.$.partnerAmounts":partnerAmounts}});
 	})
 	.then(updatedGroupAmount => {
 		return listItems(username,groupName);
@@ -80,8 +79,7 @@ var getPartnerAmounts = (groupItemList) => {
 	    _.groupBy(itemList, 'username'),
 	    function(values, username) {	    	
 	        return {
-	           amount: _.reduce(_.map(values, function(value){
-	            	console.log('value is', value);
+	           amount: _.reduce(_.map(values, function(value){	            	
 	            	return value.priceperqty*value.quantity}), sum, 0)
 	        }
 	    }
