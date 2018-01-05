@@ -29,7 +29,7 @@ db.connect(url, function(err){
 	if(err){
 		console.log("failed to connect to database");
 	}else{
-		app.listen(3000, function(){
+		app.listen(process.env.PORT || 3000, function(){
 		console.log("server listening");
 	});	
 	}
