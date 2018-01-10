@@ -5,10 +5,10 @@ const common = require('../../config');
 
 
 exports.addGroup = (req,res, next) => {
-	console.log(req.body);
+	console.log(req.decoded);
 	var data = req.body;
-
-	console.log('req.body.password is' +  req.body.password);
+	data.username = req.decoded.username;
+	
 
 	if(data.username){
 		console.log(data);	
@@ -17,7 +17,7 @@ exports.addGroup = (req,res, next) => {
 
 		result.
 		then(resp => {
-			console.log('resp is', resp);
+			//console.log('resp is', resp);
 			if(resp.result.ok){
 				return listGroups(data.username);				
 			}else{
@@ -26,8 +26,8 @@ exports.addGroup = (req,res, next) => {
 		})
 		.then(Groups =>{
 			console.log('items are', Groups);
-			console.log('itemsList are',  Groups[0].groupList);
-			return res.status(200).json(Groups[0].groupList);
+			console.log('itemsList are',  Groups);
+			return res.status(200).json(Groups);
 		})
 		.catch(err => res.status(500).send(err));	
 
@@ -38,6 +38,14 @@ exports.addGroup = (req,res, next) => {
 
 
 var listGroups = (username) => {
-	let query = {$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}]};
-	return findGroups.finddocument(common.userCollection,query);
+	//let query = {$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}]};
+	//let projection = {groupList: {$elemMatch: {partner: username}}};
+
+	query = [{$match :{$or : [{username:username},
+				 {groupList: {$elemMatch: {partner: username}}}]}},
+				 {$unwind:"$groupList"},{$match:{"groupList.partner": username}},
+				 { $group : { _id : "$_id", groupList : { $addToSet : "$groupList" }}}];
+		
+	return	findGroups.findAggregation(common.userCollection,query)
+	//return findGroups.finddocument(common.userCollection,query, projection);
 }

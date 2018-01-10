@@ -6,19 +6,22 @@ const common = require('../../config');
 
 exports.addItem = (req,res, next) => {
 	console.log(req.body);
-	var data = req.body;
+	var data = req.body.itemData;
+	var id = req.body.id;
+	data.username = req.decoded.username;
 
 	if(data.username){
 		
-		//console.log(data);	
-		let query  = {$or : [{username:data.username},{groupList: {$elemMatch: {partner: data.username}}}], groupList:{$elemMatch: {groupName: data.groupName}}};
+		//console.log(data);
+		let objId =  findItems.getObjId(id);	
+		let query  = {_id:objId, groupList:{$elemMatch: {groupName: data.groupName}}};
 		var result = insertItem.updatedocument(common.userCollection,query,{$push:{'groupList.$.itemList':data}});
 
 		result.
 		then(resp => {
 			console.log('resp is', resp);
 			if(resp.result.ok){
-				return updateGroupAmountAndPartnerAmount(data.username,data.groupName);				
+				return updateGroupAmountAndPartnerAmount(data.username,data.groupName,objId);				
 				//return listItems(data.username,data.groupName);
 			}else{
 				
@@ -38,8 +41,8 @@ exports.addItem = (req,res, next) => {
 	}
 }
 
-var updateGroupAmountAndPartnerAmount = (username, groupName) => {
-	return listItems(username, groupName)
+var updateGroupAmountAndPartnerAmount = (username, groupName, objId) => {
+	return listItems(username, groupName,objId)
 	.then(group =>{
 		let groupItemList = group[0].groupList[0].itemList;
 		let groupAmount = 0;
@@ -49,11 +52,11 @@ var updateGroupAmountAndPartnerAmount = (username, groupName) => {
 		}
 
 	let partnerAmounts = getPartnerAmounts(groupItemList);	
-	let query  = {$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}], groupList:{$elemMatch: {groupName: groupName}}};
+	let query  = {_id:objId, groupList:{$elemMatch: {groupName: groupName}}};
 	return	insertItem.updatedocument(common.userCollection, query,{$set:{"groupList.$.groupAmount": groupAmount, "groupList.$.partnerAmounts":partnerAmounts}});
 	})
 	.then(updatedGroupAmount => {
-		return listItems(username,groupName);
+		return listItems(username,groupName,objId);
 	})
 }
 
@@ -98,8 +101,8 @@ var getPartnerAmounts = (groupItemList) => {
 }
 
 
-var listItems = (username,groupName) => {
-	let query  = {$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}], groupList:{$elemMatch: {groupName: groupName}}};
+var listItems = (username,groupName,objId) => {
+	let query  = {_id:objId, groupList:{$elemMatch: {groupName: groupName}}};
 		return findItems.finddocument(common.userCollection,
 		 						  query,
 		 						  {username: 1, groupList:{$elemMatch:{groupName:groupName}}});

@@ -12,7 +12,7 @@ exports.loginuser = (req,res, next) => {
 
 		result
 		.then(resObj => {
-			console.log('login resp is', resObj);
+			//console.log('login resp is', resObj);
 			if(resObj.length){
 
 				var token = jwt.sign({username:reqBody.username}, common.secretToken,

@@ -1,4 +1,5 @@
-var MongoClient = require('mongodb').MongoClient
+var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 
 //var port = process.
 
@@ -29,4 +30,8 @@ exports.close = function(done) {
       done(err)
     })
   }
+}
+
+exports.objId = function(id){
+  return new ObjectID(id);  
 }

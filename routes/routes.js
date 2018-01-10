@@ -113,7 +113,7 @@ router.post('/deletedriver',deletedriver.deletedriver);
 router.post('/logindriver', logindriver.logindriver);
 
 router.post('/addItem', addItem.addItem);
-router.get('/listItems/:groupName', listItems.listItems);
+router.get('/listItems/:groupName/:id', listItems.listItems);
 router.post('/addGroup', addGroup.addGroup);
 router.get('/listGroup', listGroup.listGroup);
 router.post('/deleteGroup',deleteGroup.deleteGroup);

@@ -5,8 +5,7 @@ const common = require('../../config');
 exports.deleteGroup = (req,res, next) => {
 	console.log(req.body);
 	var data = req.body;
-
-	console.log('req.body.password is' +  req.body.password);
+	data.username = req.decoded.username;
 
 	if(data.username){
 		

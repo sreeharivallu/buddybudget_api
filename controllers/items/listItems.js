@@ -6,9 +6,11 @@ exports.listItems = (req,res, next) => {
 	
 	var username = req.decoded.username;
 	var groupName = req.params.groupName;
+	var id = req.params.id;
 
 	if(username){
-		let query  = {$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}], groupList:{$elemMatch: {groupName: groupName}}};
+		objId =  findGroups.getObjId(id);
+		let query  = {_id:objId};//{$or : [{username:username},{groupList: {$elemMatch: {partner: username}}}], groupList:{$elemMatch: {groupName: groupName}}};
 		findGroups.finddocument(common.userCollection,query, {username: 1, groupList:{$elemMatch:{groupName:groupName}}})
 		.then(Groups =>{
 			console.log('Groups are', Groups);

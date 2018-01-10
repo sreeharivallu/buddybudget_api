@@ -21,25 +21,30 @@ exports.finddocument = function(coll, query, projection){
 	}) 
 
 
-} /*function(object){
-	//let db = null;
+} 
 
-    //console.log('db get has', db.get());
-	dbConn = db.get();
 
-	let collection = dbConn.collection('users')
+exports.findAggregation = function(coll, query){
+	return new Promise((resolve, reject) => {
 
-	//console.log('collection is', collection);
-	collection.find().toArray()
-	.then(function(result){
-		console.log(result);
-		return result;
-	})	
-	.catch(function(err){
-		console.log(err);
-		return err;
-	}) 
-	//.then((users) => users.insert(object))
-	//.catch(err => {console.log(err)});
+		dbConn = db.get();
 
-} */
+		let collection = dbConn.collection(coll);
+
+		//console.log('collection is', collection);
+		collection.aggregate(query).toArray()
+		.then(function(result){
+			console.log(result);
+			resolve(result);
+		})	
+		.catch(function(err){
+			console.log(err);
+			reject(err);
+		}) 
+
+	})
+}
+
+exports.getObjId = function(id){
+	return db.objId(id);
+};
